@@ -17,13 +17,7 @@ exports.testNonCache = (req,res)=>{
     let terms = req.query.name; //school name
     
     //data 가져오기 
-    fetch(
-        "https://api.data.gov/ed/collegescorecard/v1/schools?api_key=" +
-          apiKey +
-          "&school.name=" +
-          terms +
-         "&fields=school.name,location.lon,location.lat&per_page=100"
-      )
+    getFetchData(terms)
       .then(result  => result.json())
       .then(result =>{
         return res.send(result);
@@ -41,12 +35,23 @@ exports.testNonCache = (req,res)=>{
  */
 exports.testCache = (req,res)=>{
     let terms = req.query.name;
-    let result = cahce[terms];
+    let result = cache[terms];
 
     if(result !=null){
         console.log("Cache hit for " + terms);
         return res.send(result);
-    }
+    }else{
+        console.log("Cache Miss for" + terms);
+        getFetchData(terms)
+        .then(result => result.json())
+        .then(result =>{
+            cache[terms] = result;
+            return res.send(result);
+        })
+        .catch(e =>{
+            console.log(e);
+        });
+    }   
 };
 
 /**
@@ -57,3 +62,19 @@ exports.testCache = (req,res)=>{
 exports.testRedisWithCache = (req,res)=>{
 
 };
+
+
+/**
+ * @desc 가져온 데이터 객체를 리턴 
+ * @param {string} terms
+ * @return fetch 
+ */
+function getFetchData(terms){
+    return fetch(
+        "https://api.data.gov/ed/collegescorecard/v1/schools?api_key=" +
+          apiKey +
+          "&school.name=" +
+          terms +
+         "&fields=school.name,location.lon,location.lat&per_page=100"
+      );
+}
