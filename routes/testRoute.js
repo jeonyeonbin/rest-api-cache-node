@@ -10,11 +10,11 @@ module.exports = (express) =>{
     const router = express.Router();
 
     // 캐시 기능 없는것
-    router.get('/noCache',testController.testNonCache); 
+    router.get('/noCache/:name',testController.testNonCache); 
     // 캐시 기능 있는것
-    router.get('/cache',testController.testCache);
+    router.get('/cache/:name',testController.testCache);
     // 레디스 캐싱
-    router.get('/redisCache',testController.testRedisWithCache);
-    
+    router.get('/redisCache/:name',testController.testRedisWithCache);
+
     return router;
 }
