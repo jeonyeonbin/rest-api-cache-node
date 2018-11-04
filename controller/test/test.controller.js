@@ -4,8 +4,7 @@
 */
 const apiKey = process.env.DATAGOVKEY;
 const fetch = require('node-fetch');
-const redis = require('redis');     //redis 연결용
-const client = redis.createClient(process.env.REDIS_URL);
+
 /* cache 데이터 */
 let cache = {};
 
@@ -15,7 +14,7 @@ let cache = {};
  * @desc 캐시 사용 안하고 데이터 불러오기 테스트
  */
 exports.testNonCache = (req,res)=>{
-    let terms = req.param.name; //school name
+    let terms = req.params.name; //school name
     
     //data 가져오기 
     getFetchData(terms)
@@ -35,11 +34,12 @@ exports.testNonCache = (req,res)=>{
  * @desc javascript 객체를 이용하여 캐시사용후  데이터 불러오기 테스트
  */
 exports.testCache = (req,res)=>{
-    let terms = req.param.name;
+    let terms = req.params.name;
     let result = cache[terms];
-
+    console.log(terms);
     if(result !=null){
         console.log("Cache hit for " + terms);
+        console.log(result);
         return res.send(result);
     }else{
         console.log("Cache Miss for" + terms);
@@ -58,15 +58,55 @@ exports.testCache = (req,res)=>{
 /**
  * @param {request} req 
  * @param {response} res
- * @desc redis를 이용하여 온메모리 캐싱 사용
+ * @desc redis를 이용하여 인 메모리 캐싱 사용
  */
 exports.testRedisWithCache = (req,res)=>{
-    let terms = req.param.name;
-    client.get('schools/'+terms,(err, result)=>{
-        return JSON.parse(result);
-    }).then(json =>{
-        client.setex('schools/'+terms,300,JSON.stringify(json));
-        res.send(json);
+    req.accepts('application/json');
+
+    let terms = req.params.name;
+    const key = 'schools/'+terms;
+    /**
+     * @desc 레디스 케시에서 먼저 확인후에 가져오기
+     */
+    req.cache.get(key,(err, result)=>{
+        if(err){
+            console.log(err);
+            return;
+        }
+        // 캐시에 만약 없다면
+        if(result == null){
+            getFetchData(terms)
+            .then(fetchData =>{
+                console.log('Cache miss');
+                return fetchData.json();
+            })
+            .then(json =>{
+                console.log(json);
+                // 캐시상에 올려주기
+                req.cache.set(key,JSON.stringify(json),(err,data)=>{
+                    if(err){
+                        console.log(err);
+                        return;
+                    }else{
+                        console.log(data);      //성공하면 OK
+                        req.cache.expire(key,10);
+                        return res.send(data);
+                    }
+                })
+            })
+            .catch(e=>{
+                console.log(e);
+            });
+        }
+        // 캐시에 있을경우     
+        else{
+            console.log('Cache HIT');
+            result = JSON.parse(result);
+            console.log(result);
+            return res.send(result);
+        }
+
+        
     });
 };
 

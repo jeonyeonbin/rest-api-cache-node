@@ -2,6 +2,8 @@ const port = 5555;
 const path = require('path');
 const session = require('express-session');
 const bodyParser =require('body-parser');
+const redis = require('redis');     //redis 연결용
+const client = redis.createClient(process.env.REDIS_URL);
 module.exports = (app,express) =>{
 
     /********************
@@ -11,12 +13,18 @@ module.exports = (app,express) =>{
     app.engine('hbs',handlebars.engine).set('view engine','hbs');
     app.set('views',path.join(__dirname,'../','views/'));
 
-     /*************
-      * json 처리를 위한 설정 
-      *************/
-     app.use(bodyParser.urlencoded({extended:true}));
-     app.use(bodyParser.json());
-
+    /*************
+     * json 처리를 위한 설정 
+     *************/
+    app.use(bodyParser.urlencoded({extended:true}));
+    app.use(bodyParser.json());
+    /***************
+     * redis setting
+     ***************/
+    app.use((req,res,next)=>{
+        req.cache = client;
+        next(); 
+    })
      /*************
       * session 설정
       *************/
