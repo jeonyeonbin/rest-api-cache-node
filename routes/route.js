@@ -22,8 +22,9 @@ module.exports = (app,express) =>{
       *************/
     app.use(session({
         resave:false,
-        saveUninitialized:false,
+        saveUninitialized:true,
         secret: '%$MYSECRET$%',
+        cookie:{secure:true},
     }));
 
     /****************
