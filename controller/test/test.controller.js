@@ -89,6 +89,7 @@ exports.testRedisWithCache = (req,res)=>{
                         return;
                     }else{
                         console.log(data);      //성공하면 OK
+                        console.log('key :' + key);
                         req.cache.expire(key,10);
                         return res.send(data);
                     }

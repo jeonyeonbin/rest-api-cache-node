@@ -1,0 +1,9 @@
+facebook
+<button id="fbShare" onclick="facebookShare()">공유하기</button>
+<script>
+    function facebookShare(){
+        var url = location.href;
+        console.log(url);
+        window.open('http://www.facebook.com/sharer/sharer.php?u='+url);
+    }
+</script>

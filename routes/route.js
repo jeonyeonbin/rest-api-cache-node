@@ -39,6 +39,7 @@ module.exports = (app,express) =>{
      * route setting
      ****************/
     app.use('/test',require('./testRoute')(express));
+    app.use('/fb',require('./fbRoute')(express));
     /***************
      * 404 error 500 err page
      **************/
