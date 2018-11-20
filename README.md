@@ -52,9 +52,18 @@ MSA 아키텍쳐는 성능 최적화 및 속도 향상을 위해 분산 아키�
 그래서 npm document 에 있는 hystrix 를 이용하여 진행 해보려고한다. 
 
 
-함수 정의
+[설정 함수 정의]
 
-
+circuitBreakerSleepWindowInMilliseconds - API 서버가 응답시 최대 대기할수있는 milliseconds 
+errorHandler - 서비스의 오류 응답이 실제 오류인지 확인하는 기능입니다. 이 함수가 오류 개체(기본 구현)를 반환하는 경우 이 요청 호출은 오류 백분율에 영향을 미치는 실패로 표시됩니다. null 또는 false를 반환하면 호출이 실패로 표시되지 않습니다. 예를 들어 고객을 찾을 수 없는 경우 404 오류가 발생할 수 있습니다.
+circuitBreakerRequestVolumeThreshold - 회로 차단기가 상태를 계산하기 위해 전혀 성가시게 되기 전에, 초과해야 하는 롤링 윈도우의 최소 요청 수
+circuitBreakerForceOpened - 서킷 브레이커 항상 오픈
+circuitBreakerForceClosed - 서킷 브레이커 항상 클로즈
+circuitBreakerErrorThresholdPercentage - error percentage threshold to trip the circuit
+statisticalWindowLength -실행 횟수를 추적할 수 있는 윈도우의 길이 메트릭(성공, 실패)
+statisticalWindowNumberOfBuckets - 통계 창의 버킷수
+percentileWindowNumberOfBuckets - 백분위 창의 버킷수
+fallbackto - 요청이 실패할 경우 실행되는 기능. 이 함수는 첫 번째 인수로, 두 번째 인수로 원래 args의 배열로 호출됩니다. 
 
 
 
