@@ -38,8 +38,10 @@ module.exports = (app,express) =>{
     /****************
      * route setting
      ****************/
-    app.use('/test',require('./testRoute')(express));
-    app.use('/fb',require('./fbRoute')(express));
+    
+    app.use('/',require('./frontRoute')(express));    //front router
+    app.use('/test',require('./testRoute')(express)); //test router
+    app.use('/fb',require('./fbRoute')(express));     //facebook router
     /***************
      * 404 error 500 err page
      **************/
